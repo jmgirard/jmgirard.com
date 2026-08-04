@@ -1,0 +1,52 @@
+# Working documents — kept local.
+# PRODUCT.md and bio.md name consulting clients that are not cleared for public
+# display. Do not commit these to a public repo without scrubbing them first.
+PRODUCT.md
+bio.md
+
+# Original camera files — kept locally, never committed.
+# Web-ready derivatives are generated from these and ARE committed:
+#   *_009.JPG      -> headshot-working.jpg   (2400px)
+#   *_010.JPG      -> headshot-smiling.jpg   (2400px)
+#   OAWeekKeynote-4.jpg -> award-oaweek.jpg  (2000px)
+20251020_jeffrey_girard_shulenburger25_*.JPG
+OAWeekKeynote-*.jpg
+*.NEF
+*.CR2
+*.DNG
+/photos-original/
+
+# Build output
+dist/
+.impeccable/shots/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Third-party tooling vendored into this project by the editor — not this
+# project's code, and not ours to redistribute.
+.claude/skills/
+
+# Impeccable working state. The design-system sidecar is the one artifact
+# worth versioning; the rest is per-session scratch.
+.impeccable/*
+!.impeccable/design.json
+
+# Image derivatives kept locally. The committed copies the build actually
+# consumes live in src/assets/; these root-level duplicates are working files.
+# award-oaweek.jpg was deliberately excluded from the design; headshot.jpeg is
+# the old 460px avatar, superseded by the 2400px crops.
+/award-oaweek.jpg
+/headshot.jpeg
+/headshot-working.jpg
+/headshot-smiling.jpg

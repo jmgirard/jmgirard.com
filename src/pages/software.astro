@@ -1,0 +1,264 @@
+---
+import Base from '../layouts/Base.astro';
+import Arrow from '../components/Arrow.astro';
+import { groups, softwareSummary, GRADES } from '../data/software.js';
+
+const gradeOrder = ['stable', 'experimental', 'deprecated'];
+---
+
+<Base
+  title="Instruments — Jeff Girard"
+  description="Open-source software for measurement, affective computing and reproducible research. Nineteen tools, each labeled with its real state."
+  panel="software"
+>
+  <section class="head">
+    <div class="chassis">
+      <div class="nameplate">
+        <h1 class="head__title">Software</h1>
+        <p class="head__lede">
+        Nineteen open-source tools. Each one carries its calibration, because
+        a tool that says it is finished when it is not costs you more than
+        one that admits what it is.
+      </p>
+      </div>
+
+      <dl class="legend">
+        {gradeOrder.map((g) => (
+          <div class="legend__item">
+            <dt><span class={`stamp stamp--${g}`}>{GRADES[g].short}</span></dt>
+            <dd>
+              <b>{GRADES[g].label}.</b> {GRADES[g].note}
+              <span class="legend__count">{softwareSummary[g]}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  {groups.map((group) => (
+    <section class="group">
+      <hr class="seam" />
+      <div class="chassis">
+        <header class="group__head">
+          <div>
+            <h2 class="engraved group__name">{group.name}</h2>
+            <p class="group__caption">{group.caption}</p>
+          </div>
+          <p class="group__count">{group.items.length}</p>
+        </header>
+
+        <ul class="rack">
+          {group.items.map((s) => (
+            <li class={`unit unit--${s.grade}`}>
+              <div class="unit__top">
+                <h3 class="unit__name">
+                  <a href={s.url}>{s.name}</a>
+                </h3>
+                <span class={`stamp stamp--${s.grade}`}>{GRADES[s.grade].short}</span>
+              </div>
+              <p class="unit__blurb">{s.blurb}</p>
+              <p class="unit__foot">
+                <span class="engraved">{s.lang}</span>
+                <a class="unit__link" href={s.url}>
+                  {s.url.includes('github.com') ? 'Repository' : 'Project site'}
+                  <Arrow size={12} />
+                </a>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+
+  <section class="tail">
+    <div class="chassis">
+      <p class="tail__note">
+        This is the curated set. Everything else &mdash; course materials,
+        one-off containers, experiments &mdash; lives at
+        <a href="https://github.com/jmgirard">github.com/jmgirard</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .head { padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3rem); }
+
+  .nameplate {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(1rem, 4vw, 3.5rem);
+    align-items: end;
+    padding-block: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: var(--rule-heavy) solid var(--brass);
+    border-bottom: var(--rule) solid var(--enamel-edge);
+  }
+
+  @media (max-width: 760px) {
+    .nameplate { grid-template-columns: 1fr; gap: 0.9rem; align-items: start; }
+  }
+
+  .head__title {
+    font-size: var(--step-4);
+    font-weight: 600;
+    font-stretch: 92%;
+    color: #f0ece0;
+  }
+
+  .head__lede {
+    font-family: var(--serif);
+    font-size: var(--step-1);
+    line-height: 1.55;
+    max-width: 48ch;
+    color: var(--ink-on-enamel);
+    padding-bottom: 0.3rem;
+  }
+
+  .legend {
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
+    display: grid;
+    gap: 0.85rem;
+    max-width: 60ch;
+  }
+  .legend__item {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding-top: 0.7rem;
+    border-top: var(--rule) solid var(--enamel-edge);
+  }
+  .legend dt, .legend dd { margin: 0; }
+  .legend dd {
+    font-size: var(--step--1);
+    color: var(--ink-on-enamel-soft);
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .legend dd b { color: var(--ink-on-enamel); font-weight: 600; }
+  .legend__count {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--brass);
+  }
+
+  .group { padding-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+
+  .group__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: clamp(1.75rem, 3.5vw, 2.75rem) 1.25rem;
+  }
+
+  .group__name { font-size: var(--step--1); }
+
+  .group__caption {
+    font-family: var(--serif);
+    font-size: var(--step-0);
+    color: var(--ink-on-enamel-soft);
+    margin-top: 0.4rem;
+    max-width: 44ch;
+  }
+
+  .group__count {
+    font-size: var(--step-2);
+    font-weight: 700;
+    color: var(--brass);
+    line-height: 1;
+  }
+
+  .rack {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: var(--rule);
+  }
+
+  .unit {
+    background: var(--enamel);
+    outline: var(--rule) solid var(--enamel-edge);
+    padding: clamp(1.15rem, 2vw, 1.6rem);
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    transition: background 160ms ease;
+  }
+  .unit:hover { background: var(--enamel-lit); }
+
+  /* Withdrawn units read quieter, without hiding. */
+  .unit--deprecated { background: var(--enamel-deep); }
+  .unit--deprecated .unit__name a { color: var(--ink-on-enamel-soft); }
+
+  .unit__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .unit__name { font-size: var(--step-1); font-weight: 600; }
+  .unit__name a {
+    text-decoration: none;
+    color: #f0ece0;
+    border-bottom: var(--rule-heavy) solid transparent;
+    transition: border-color 140ms ease, color 140ms ease;
+  }
+  .unit__name a:hover { color: var(--signal); border-color: var(--signal); }
+
+  .unit__blurb {
+    font-family: var(--serif);
+    font-size: var(--step-0-sm);
+    line-height: 1.5;
+    color: var(--ink-on-enamel-soft);
+  }
+
+  .unit__foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.35rem;
+    padding-top: 0.7rem;
+    border-top: var(--rule) solid var(--enamel-edge);
+  }
+
+  .unit__link {
+    font-size: var(--micro);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--brass);
+    display: inline-flex;
+    gap: 0.4rem;
+    transition: color 140ms ease;
+  }
+  .unit__link:hover { color: var(--signal); }
+
+  .tail { padding-block: clamp(2.5rem, 5vw, 4rem); }
+  .tail__note {
+    font-family: var(--serif);
+    font-size: var(--step-0);
+    color: var(--ink-on-enamel-soft);
+    max-width: 54ch;
+  }
+  .tail__note a {
+    color: var(--ink-on-enamel);
+    border-bottom: var(--rule) solid var(--brass);
+    text-decoration: none;
+  }
+  .tail__note a:hover { color: var(--signal); }
+
+  @media (max-width: 560px) {
+    .legend__item { grid-template-columns: 1fr; gap: 0.4rem; }
+  }
+</style>

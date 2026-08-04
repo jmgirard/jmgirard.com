@@ -1,0 +1,198 @@
+---
+/**
+ * The instrument's main scale. Every tick is one real publication from
+ * references.bib, placed by year across 2011–2026. Lab-led work is cut
+ * deeper and inked amber. Nothing here is decorative: remove the data
+ * and the graphic disappears.
+ */
+const { publications, summary, compact = false } = Astro.props;
+
+const first = summary.firstYear;
+const last = summary.lastYear;
+const years = [];
+for (let y = first; y <= last; y++) years.push(y);
+
+// Lay out each year as a column of ticks so density reads as output over time.
+const columns = years.map((year) => {
+  const inYear = publications.filter((p) => p.year.value === year);
+  return {
+    year,
+    items: inYear,
+    count: inYear.length,
+    labLed: inYear.filter((p) => p.labLed).length,
+  };
+});
+
+const inPress = publications.filter((p) => p.year.value === null);
+const peak = Math.max(...columns.map((c) => c.count), 1);
+
+const VIEW_W = 1000;
+const VIEW_H = compact ? 120 : 190;
+const BASE_Y = VIEW_H - (compact ? 26 : 42);
+const UNIT = compact ? 7 : 11;   // height of one publication tick
+const GAP = compact ? 2 : 3;
+const slotW = VIEW_W / (columns.length + (inPress.length ? 1 : 0));
+---
+
+<figure class={`rule ${compact ? 'rule--compact' : ''}`}>
+  <figcaption class="rule__caption">
+    <span class="engraved">Published record</span>
+    <span class="rule__legend">
+      <span class="rule__key"><i class="rule__swatch rule__swatch--lab"></i>{summary.labLed} lab-led</span>
+      <span class="rule__key"><i class="rule__swatch"></i>{summary.total - summary.labLed} collaborations</span>
+    </span>
+  </figcaption>
+
+  <svg
+    class="rule__svg"
+    viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+    preserveAspectRatio="none"
+    role="img"
+    aria-label={`Publication record: ${summary.total} publications from ${first} to ${last}, of which ${summary.labLed} are lab-led.`}
+  >
+    <!-- Baseline: the engraved scale line -->
+    <line x1="0" y1={BASE_Y} x2={VIEW_W} y2={BASE_Y} stroke="var(--brass)" stroke-width="1.5" />
+
+    {columns.map((col, ci) => {
+      const cx = slotW * ci + slotW / 2;
+      // Sort so lab-led ticks sit at the bottom of the stack, nearest the scale.
+      const ordered = [...col.items].sort((a, b) => Number(b.labLed) - Number(a.labLed));
+      return (
+        <g class="rule__col" data-year={col.year}>
+          {/* Major graduation */}
+          <line
+            x1={cx} y1={BASE_Y} x2={cx} y2={BASE_Y + (compact ? 7 : 11)}
+            stroke="var(--brass)" stroke-width="1"
+          />
+          {ordered.map((p, i) => (
+            <rect
+              x={cx - (compact ? 5 : 8)}
+              y={BASE_Y - (i + 1) * UNIT - i * GAP}
+              width={compact ? 10 : 16}
+              height={UNIT}
+              fill={p.labLed ? 'var(--signal)' : 'var(--brass-dim)'}
+              opacity={p.labLed ? 1 : 0.85}
+            >
+              <title>{`${p.year.label} · ${p.title}`}</title>
+            </rect>
+          ))}
+        </g>
+      );
+    })}
+
+    {inPress.length > 0 && (
+      <g class="rule__col rule__col--inpress">
+        {inPress.map((p, i) => (
+          <rect
+            x={slotW * columns.length + slotW / 2 - (compact ? 5 : 8)}
+            y={BASE_Y - (i + 1) * UNIT - i * GAP}
+            width={compact ? 10 : 16}
+            height={UNIT}
+            fill={p.labLed ? 'var(--signal)' : 'var(--brass-dim)'}
+            stroke="var(--signal)"
+            stroke-width="1"
+            stroke-dasharray="2 2"
+          >
+            <title>{`In press · ${p.title}`}</title>
+          </rect>
+        ))}
+      </g>
+    )}
+  </svg>
+
+  <div class="rule__scale" aria-hidden="true">
+    {columns.map((c) => (
+      <span class="rule__year" data-decade={c.year % 5 === 0 ? 'true' : 'false'}>
+        {c.year % 5 === 0 || c.year === first || (c.year === last && last % 5 > 1) ? c.year : ''}
+      </span>
+    ))}
+    {inPress.length > 0 && <span class="rule__year rule__year--inpress">in press</span>}
+  </div>
+</figure>
+
+<style>
+  .rule { margin: 0; }
+
+  .rule__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-bottom: 0.65rem;
+  }
+
+  .rule__legend {
+    display: flex;
+    gap: 1.1rem;
+    font-size: var(--step--1);
+    color: var(--ink-on-enamel-soft);
+  }
+
+  .rule__key { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  .rule__swatch {
+    width: 9px;
+    height: 9px;
+    background: var(--brass-dim);
+    display: inline-block;
+  }
+  .rule__swatch--lab { background: var(--signal); }
+
+  .rule__svg {
+    width: 100%;
+    height: clamp(112px, 12vw, 152px);
+    display: block;
+    overflow: visible;
+  }
+  .rule--compact .rule__svg { height: clamp(84px, 10vw, 120px); }
+
+  .rule__scale {
+    display: flex;
+    padding-top: 0.35rem;
+  }
+
+  .rule__year {
+    flex: 1 1 0;
+    text-align: center;
+    font-size: var(--micro);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--brass);
+    min-width: 0;
+  }
+  .rule__year--inpress {
+    flex: 0 0 3.5rem;
+    color: var(--signal);
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+
+  /* Ticks grow from the scale line on first paint. */
+  @media (prefers-reduced-motion: no-preference) {
+    .rule__svg rect {
+      transform-box: fill-box;
+      transform-origin: bottom center;
+      animation: grow 620ms cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+    }
+    .rule__col:nth-child(2) rect { animation-delay: 40ms; }
+    .rule__col:nth-child(3) rect { animation-delay: 80ms; }
+    .rule__col:nth-child(4) rect { animation-delay: 120ms; }
+    .rule__col:nth-child(5) rect { animation-delay: 160ms; }
+    .rule__col:nth-child(6) rect { animation-delay: 200ms; }
+    .rule__col:nth-child(7) rect { animation-delay: 240ms; }
+    .rule__col:nth-child(8) rect { animation-delay: 280ms; }
+    .rule__col:nth-child(9) rect { animation-delay: 320ms; }
+    .rule__col:nth-child(10) rect { animation-delay: 360ms; }
+    .rule__col:nth-child(n + 11) rect { animation-delay: 400ms; }
+
+    @keyframes grow {
+      from { transform: scaleY(0); opacity: 0.2; }
+      to { transform: scaleY(1); opacity: 1; }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .rule__year { font-size: var(--micro-sm); }
+  }
+</style>

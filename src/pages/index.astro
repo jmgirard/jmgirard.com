@@ -1,0 +1,607 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import CalibrationRule from '../components/CalibrationRule.astro';
+import Arrow from '../components/Arrow.astro';
+import { loadPublications, summarize, formatAuthorsHtml } from '../lib/bib.js';
+import { groups, allSoftware, softwareSummary, featured, GRADES } from '../data/software.js';
+import portrait from '../assets/headshot-working.jpg';
+
+const publications = loadPublications();
+const summary = summarize(publications);
+
+/**
+ * Curated by relevance to what a client is hiring for, not by date. Each key
+ * is chosen to answer a different question: can he evaluate a model, does the
+ * field treat him as an authority, can he build a dataset, has he done applied
+ * clinical work, can he validate a measure. Edit this list to re-curate.
+ */
+const SELECTED = [
+  'girard2026',   // LLM evaluation on naturalistic speech
+  'girard2026a',  // Annual Review — authority in the field
+  'girard2023a',  // DynAMoS — dataset design and collection
+  'girard2025',   // applied affective computing in therapy
+  'girard2021',   // measurement validation
+];
+
+const byKey = new Map(publications.map((p) => [p.key, p]));
+const selected = SELECTED.map((k) => byKey.get(k)).filter(Boolean);
+const featuredSoftware = featured
+  .map((name) => allSoftware.find((s) => s.name === name))
+  .filter(Boolean);
+
+/**
+ * Seven service areas, clustered into three ranges. Grouping was delegated:
+ * a flat list of seven reads as an agency menu, and prose alone hides whether
+ * a visitor's specific problem is covered.
+ */
+const ranges = [
+  {
+    name: 'AI evaluation',
+    lede: 'For teams shipping systems that make claims about people.',
+    items: [
+      'Dataset and benchmark design and collection',
+      'Model evaluation',
+      'Generative psychometrics',
+    ],
+  },
+  {
+    name: 'Measurement and statistics',
+    lede: 'For work that has to survive review.',
+    items: [
+      'Instrument development and validation',
+      'Inter-rater reliability and psychometrics',
+      'Study design and statistical analysis',
+    ],
+  },
+  {
+    name: 'Tooling and training',
+    lede: 'For teams who want the capability in-house.',
+    items: [
+      'R package and pipeline development',
+      'Workshops and methods training',
+    ],
+  },
+];
+---
+
+<Base title="Jeff Girard — measurement and evaluation for systems that make claims about people">
+  <!-- ============ PANEL 01 · THE FACE OF THE INSTRUMENT ============ -->
+  <section class="face">
+    <div class="chassis face__inner">
+      <div class="face__text">
+        <h1 class="face__lede">
+          I work at the seam between psychological measurement and machine
+          learning &mdash; building datasets, benchmarks and evaluations for
+          systems that make claims about <em>human behavior</em>.
+        </h1>
+        <div class="face__action">
+          <a class="signal-button" href="mailto:me@jmgirard.com">
+            <span class="lamp" aria-hidden="true"></span>
+            me@jmgirard.com
+          </a>
+          <p class="face__action-note">
+            Consulting through Girard&nbsp;Consulting&nbsp;LLC
+          </p>
+        </div>
+      </div>
+
+      <figure class="bezel">
+        <Image
+          src={portrait}
+          alt="Jeff Girard at a workstation, looking at a monitor showing a data plot."
+          widths={[420, 640, 900]}
+          sizes="(max-width: 900px) 100vw, 38vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <figcaption class="engraved">Affective Communication &amp; Computing Lab &middot; KU</figcaption>
+      </figure>
+    </div>
+
+    <div class="chassis face__rule">
+      <CalibrationRule publications={publications} summary={summary} />
+
+      <p class="readout">
+        <span class="readout__item"><b class="readout__n">{summary.total}</b>publications, {summary.firstYear}–{summary.lastYear}</span>
+        <span class="readout__item"><b class="readout__n">{summary.labLed}</b>lab-led</span>
+        <span class="readout__item"><b class="readout__n">{summary.withPreprint}</b>open preprints</span>
+        <span class="readout__item"><b class="readout__n">{summary.withMaterials}</b>with data or code</span>
+        <span class="readout__item"><b class="readout__n">{softwareSummary.total}</b>open-source tools</span>
+      </p>
+    </div>
+  </section>
+
+  <hr class="seam" />
+
+  <!-- ============ PLATE 01 · WHO IS OPERATING THIS ============ -->
+  <section class="plate about">
+    <div class="chassis about__inner">
+      <p class="engraved engraved--onplate about__label">About</p>
+      <div class="about__body">
+        <div class="about__prose">
+          <p>
+            I&rsquo;m an Associate Professor of Psychology and Data Science at the
+            University of Kansas, where I direct the Affective Communication and
+            Computing Lab. I trained as a clinical psychologist &mdash; PhD,
+            University of Pittsburgh, 2018 &mdash; and my research is about
+            measuring things that resist measurement: emotion, clinical state,
+            the texture of a conversation.
+          </p>
+          <p>
+            That work has appeared in <em>Annual Review of Clinical Psychology</em>,
+            <em>Journal of Consulting and Clinical Psychology</em> and
+            <em>Affective Science</em>, and it has produced open-source tools that
+            other researchers use.
+          </p>
+          <p>
+            Through Girard Consulting I bring the same standards to applied work
+            &mdash; dataset and benchmark design, model evaluation and generative
+            psychometrics for teams building systems that reason about people.
+            I&rsquo;m also a co-founder of <a href="https://smart-workshops.com">SMaRT Workshops</a>
+            and Principal Scientist at <a href="https://fluidconcepts.ai">Fluid Concepts Research</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ PANEL 03 · RANGES ============ -->
+  <section class="ranges">
+    <div class="chassis">
+      <header class="section-head">
+        <h2 class="section-head__title">What I am hired for, in three ranges.</h2>
+      </header>
+
+      <div class="channels">
+        {ranges.map((r) => (
+          <article class="channel">
+            <div class="channel__id">
+              <h3 class="channel__name">{r.name}</h3>
+              <p class="channel__lede">{r.lede}</p>
+            </div>
+            <ul class="channel__list">
+              {r.items.map((i) => <li>{i}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <hr class="seam" />
+
+  <!-- ============ PLATE 02 · INSTRUMENTS ============ -->
+  <section class="plate instruments">
+    <div class="chassis">
+      <header class="section-head section-head--plate">
+        <div>
+          <h2 class="section-head__title">
+            Software I build, labeled with its real state.
+          </h2>
+        </div>
+        <a class="plate-link" href="/software">
+          All {softwareSummary.total} tools
+          <Arrow />
+        </a>
+      </header>
+
+      <p class="instruments__note">
+        Every tool carries its calibration: {softwareSummary.stable} in calibration,
+        {' '}{softwareSummary.experimental} under calibration,
+        {' '}{softwareSummary.deprecated} withdrawn. I would rather you know which is which.
+      </p>
+
+      <ul class="instrument-rack">
+        {featuredSoftware.map((s) => (
+          <li class="instrument">
+            <a class="instrument__link" href={s.url}>
+              <span class="instrument__name">{s.name}</span>
+              <span class={`stamp stamp--${s.grade}`}>{GRADES[s.grade].short}</span>
+            </a>
+            <p class="instrument__blurb">{s.blurb}</p>
+            <p class="instrument__lang engraved engraved--onplate">{s.lang}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PANEL 04 · SELECTED RECORD ============ -->
+  <section class="record">
+    <div class="chassis">
+      <header class="section-head section-head--split">
+        <div>
+          <h2 class="section-head__title">Work I drove.</h2>
+        </div>
+        <a class="panel-link" href="/publications">
+          Full record &mdash; all {summary.total}
+          <Arrow />
+        </a>
+      </header>
+
+      <ol class="record__list">
+        {selected.map((p) => (
+          <li class="entry">
+            <div class="entry__year">
+              <span>{p.year.label}</span>
+            </div>
+            <div class="entry__body">
+              <h3 class="entry__title">
+                {p.doiUrl ? <a href={p.doiUrl}>{p.title}</a> : p.title}
+              </h3>
+              <p class="entry__authors" set:html={formatAuthorsHtml(p.authors)}></p>
+              <p class="entry__venue">
+                <em>{p.venue}</em>{p.volume && <span>, {p.volume}</span>}{p.pages && <span>, {p.pages}</span>}
+              </p>
+              <p class="entry__links">
+                {p.doiUrl && <a href={p.doiUrl}>DOI</a>}
+                {p.preprint && <a href={p.preprint}>Preprint</a>}
+                {p.materials && <a href={p.materials}>Materials</a>}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Face ---------- */
+  .face { position: relative; padding-top: clamp(2rem, 4vw, 3rem); }
+
+  .face__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+    gap: clamp(1.75rem, 5vw, 4.5rem);
+    align-items: center;
+    padding-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .face__lede {
+    font-size: var(--step-3);
+    font-weight: 500;
+    font-stretch: 96%;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: #f0ece0;
+  }
+  .face__lede em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--signal);
+  }
+
+  .face__action {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    flex-wrap: wrap;
+    margin-top: clamp(1.35rem, 2.2vw, 1.85rem);
+  }
+  .face__action-note {
+    font-size: var(--step--1);
+    color: var(--ink-on-enamel-soft);
+    max-width: 20ch;
+    line-height: 1.4;
+  }
+
+  /* The portrait sits in a machined bezel, not a floating card. */
+  .bezel {
+    margin: 0;
+    position: relative;
+    background: var(--enamel-deep);
+    border: var(--rule) solid var(--enamel-edge);
+    padding: 10px;
+    box-shadow: var(--shadow-2);
+  }
+  .bezel :global(img) {
+    width: 100%;
+    height: auto;
+    filter: saturate(0.9) contrast(1.03);
+  }
+  .bezel figcaption {
+    margin-top: 0.6rem;
+    font-size: var(--micro-sm);
+    letter-spacing: 0.14em;
+  }
+
+  .face__rule { padding-bottom: clamp(1.5rem, 3vw, 2.25rem); }
+
+  /* ---------- About plate ---------- */
+  .about { padding-block: clamp(3rem, 7vw, 6rem); }
+
+  .about__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr);
+    gap: clamp(1rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+
+  .about__label {
+    position: sticky;
+    top: 5rem;
+    padding-top: 0.45rem;
+    border-top: var(--rule-heavy) solid var(--brass-dim);
+  }
+
+  .about__prose {
+    font-family: var(--serif);
+    font-size: var(--step-1);
+    line-height: 1.6;
+    max-width: 66ch;
+    margin-top: 0;
+    display: grid;
+    gap: 1.15rem;
+  }
+  .about__prose em { font-style: italic; }
+  .about__prose a {
+    color: var(--plate-ink);
+    text-decoration: none;
+    border-bottom: var(--rule-heavy) solid var(--signal);
+    padding-bottom: 1px;
+  }
+  .about__prose a:hover { background: rgba(232, 163, 61, 0.22); }
+
+
+  /* ---------- Section heads ---------- */
+  .section-head { padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 3vw, 2.25rem); }
+  .section-head--split,
+  .section-head--plate {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    flex-wrap: wrap;
+  }
+  .section-head--plate { padding-top: 0; }
+
+  .section-head__title {
+    font-size: var(--step-2);
+    font-weight: 500;
+    font-stretch: 96%;
+    margin-top: 0.65rem;
+    max-width: 24ch;
+    text-wrap: balance;
+  }
+
+  .panel-link, .plate-link {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-flex;
+    gap: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: var(--rule-heavy) solid var(--brass-dim);
+    transition: border-color 140ms ease, color 140ms ease;
+  }
+  .panel-link { color: var(--ink-on-enamel); }
+  .panel-link:hover { color: var(--signal); border-color: var(--signal); }
+  .plate-link { color: var(--plate-ink); }
+  .plate-link:hover { color: #7d5a13; border-color: var(--signal); }
+
+  /* ---------- Ranges ---------- */
+  .ranges { padding-bottom: clamp(3rem, 6vw, 5rem); }
+
+
+  /* ---------- Channels: three ranges stacked on one panel ---------- */
+
+  .channels { border-top: var(--rule) solid var(--enamel-edge); }
+
+  .channel {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(1rem, 4vw, 3.5rem);
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-bottom: var(--rule) solid var(--enamel-edge);
+    align-items: start;
+  }
+
+  /* The lead range carries more weight; they are not three peers. */
+  .channel:first-child .channel__name { font-size: var(--step-2); }
+  .channel:first-child .channel__lede { color: var(--ink-on-enamel); }
+
+  .channel__name {
+    font-size: var(--step-1);
+    font-weight: 600;
+    color: #f0ece0;
+  }
+
+  .channel__lede {
+    font-family: var(--serif);
+    font-size: var(--step-0);
+    line-height: 1.5;
+    color: var(--ink-on-enamel-soft);
+    margin-top: 0.5rem;
+    max-width: 34ch;
+  }
+
+  .channel__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding-top: 0.3rem;
+  }
+
+  .channel__list li {
+    font-size: var(--step-0);
+    line-height: 1.4;
+    color: var(--ink-on-enamel);
+    padding-left: 1.35rem;
+    position: relative;
+  }
+
+  /* A graduation mark, matching the ticks on the main scale. */
+  .channel__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.52em;
+    width: 9px;
+    height: var(--rule-heavy);
+    background: var(--brass);
+  }
+
+  /* ---------- Instruments plate ---------- */
+  .instruments { padding-block: clamp(3rem, 6vw, 5rem); }
+
+  .instruments__note {
+    font-family: var(--serif);
+    font-size: var(--step-0);
+    color: var(--plate-ink-soft);
+    max-width: 58ch;
+    margin-bottom: 2rem;
+  }
+
+  .instrument-rack {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--rule);
+    background: var(--plate-shade);
+    border: var(--rule) solid var(--plate-shade);
+  }
+
+  .instrument {
+    background: var(--plate);
+    padding: clamp(1.1rem, 2vw, 1.5rem);
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    transition: background 140ms ease;
+  }
+  .instrument:hover { background: var(--plate-lit); }
+
+  .instrument__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .instrument__name {
+    font-size: var(--step-1);
+    font-weight: 600;
+    font-family: var(--sans);
+    color: var(--plate-ink);
+    border-bottom: var(--rule-heavy) solid transparent;
+    transition: border-color 140ms ease;
+  }
+  .instrument__link:hover .instrument__name { border-color: var(--signal); }
+
+  .instrument__blurb {
+    font-family: var(--serif);
+    font-size: var(--step-0-sm);
+    line-height: 1.45;
+    color: var(--plate-ink-soft);
+  }
+
+  .instrument__lang { font-size: var(--micro-sm); }
+
+  /* ---------- Record ---------- */
+  .record { padding-bottom: clamp(3.5rem, 7vw, 6rem); }
+
+  .record__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: var(--rule) solid var(--enamel-edge);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: clamp(1rem, 3vw, 2.5rem);
+    padding-block: clamp(1.35rem, 2.5vw, 1.9rem);
+    border-bottom: var(--rule) solid var(--enamel-edge);
+  }
+
+  .entry__year {
+    font-size: var(--step--1);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--signal);
+    padding-top: 0.25rem;
+  }
+
+  .entry__title {
+    font-size: var(--step-1);
+    font-weight: 500;
+    line-height: 1.25;
+    max-width: 46ch;
+  }
+  .entry__title a {
+    text-decoration: none;
+    border-bottom: var(--rule) solid var(--brass-dim);
+    padding-bottom: 2px;
+    transition: border-color 140ms ease, color 140ms ease;
+  }
+  .entry__title a:hover { color: var(--signal); border-color: var(--signal); }
+
+  .entry__authors {
+    font-size: 0.82rem;
+    color: var(--ink-on-enamel-soft);
+    margin-top: 0.5rem;
+    line-height: 1.45;
+  }
+  .entry__authors :global(b) { color: var(--ink-on-enamel); font-weight: 700; }
+
+  .entry__venue {
+    font-family: var(--serif);
+    font-size: var(--step-0-sm);
+    color: var(--ink-on-enamel-soft);
+    margin-top: 0.2rem;
+  }
+
+  .entry__links {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .entry__links a {
+    font-size: var(--micro);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--brass);
+    border: var(--rule) solid var(--brass-dim);
+    padding: 0.2rem 0.5rem;
+    transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+  }
+  .entry__links a:hover {
+    color: var(--enamel-deep);
+    background: var(--signal);
+    border-color: var(--signal);
+  }
+
+  /* ---------- Adaptation ---------- */
+  @media (max-width: 900px) {
+    .about__inner { grid-template-columns: 1fr; gap: 1rem; }
+    .about__label { position: static; }
+    .instrument-rack { grid-template-columns: repeat(2, 1fr); }
+    .channel { grid-template-columns: 1fr; gap: 0.9rem; }
+    .face__inner { grid-template-columns: 1fr; }
+    .bezel { max-width: 400px; }
+  }
+
+  @media (max-width: 560px) {
+    .instrument-rack { grid-template-columns: 1fr; }
+    .entry { grid-template-columns: 1fr; gap: 0.4rem; }
+    .entry__year { padding-top: 0; }
+  }
+</style>

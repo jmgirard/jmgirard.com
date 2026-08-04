@@ -1,0 +1,56 @@
+---
+import '../styles/instrument.css';
+import Chrome from '../components/Chrome.astro';
+import Footer from '../components/Footer.astro';
+
+const {
+  title,
+  description = 'Psychological measurement and machine learning — datasets, benchmarks, and model evaluation for systems that make claims about human behavior.',
+  panel = 'index',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#121a16" />
+    <link rel="preload" href="/fonts/archivo-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/literata-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body data-panel={panel}>
+    <!--
+      THESIS: This surface is a measuring instrument; every claim on it carries the
+      tolerance stamped beside it. It refuses both category ruts — the consultant hero
+      with three service cards, and the faculty page with a sidebar headshot.
+      OWN-WORLD: Dark enamelled green-black chassis with warm cream engraved plates
+      inset for reading; brass hairlines rule everything; amber is spent only on live
+      state and the single action. Engraved condensed caps label; a technical serif reads.
+      STORY: A visitor sees measurement demonstrated with real data before any claim is
+      made, believes the rigor is verifiable rather than asserted, and emails him.
+      FIRST VIEWPORT: Full-width enamel panel; engraved nameplate; a calibrated rule whose
+      68 ticks are the real publications 2011–2026, lab-led ones cut deeper in amber;
+      working portrait right in an inset bezel, gaze travelling left; amber email control.
+      FORM: The calibrated bench instrument; candidate 6 of the ordered grounded list;
+      seed key 7dea6c86.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <a class="skip" href="#main">Skip to content</a>
+    <Chrome />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import portraitWarm from '../assets/headshot-smiling.jpg';
+
+const affiliations = [
+  { role: 'Associate Professor of Psychology and Data Science', org: 'University of Kansas', url: 'https://psych.ku.edu' },
+  { role: 'Director', org: 'Affective Communication and Computing Lab', url: 'https://affcom.ku.edu' },
+  { role: 'Co-founder', org: 'SMaRT Workshops', url: 'https://smart-workshops.com' },
+  { role: 'Principal Scientist', org: 'Fluid Concepts Research', url: 'https://fluidconcepts.ai' },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <hr class="seam" />
+  <div class="chassis foot__inner">
+    <div class="foot__contact">
+      <p class="foot__pitch">
+        Tell me what you are trying to measure, and what would count as getting it right.
+      </p>
+      <a class="signal-button" href="mailto:me@jmgirard.com">
+        <span class="lamp" aria-hidden="true"></span>
+        me@jmgirard.com
+      </a>
+    </div>
+
+    <figure class="foot__portrait">
+      <Image
+        src={portraitWarm}
+        alt="Jeff Girard"
+        widths={[320, 480, 640]}
+        sizes="(max-width: 900px) 45vw, 22vw"
+        loading="lazy"
+      />
+    </figure>
+
+    <div class="foot__affil">
+      <p class="engraved">Appointments</p>
+      <ul class="foot__list">
+        {affiliations.map((a) => (
+          <li>
+            <span class="foot__role">{a.role}</span>
+            <a class="foot__org" href={a.url}>{a.org}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="foot__meta">
+      <p class="engraved">Elsewhere</p>
+      <ul class="foot__list foot__list--links">
+        <li><a href="https://github.com/jmgirard">github.com/jmgirard</a></li>
+        <li><a href="/publications">Full publication record</a></li>
+        <li><a href="/software">All 19 tools</a></li>
+      </ul>
+      <p class="foot__legal">
+        Consulting through Girard Consulting LLC · &copy; {year} Jeffrey M. Girard
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot { background: var(--enamel-deep); }
+
+  .foot__inner {
+    display: grid;
+    grid-template-columns: 1fr 0.75fr 0.9fr 0.9fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    padding-block: clamp(2.75rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  .foot__portrait {
+    margin: 0;
+    border: var(--rule) solid var(--enamel-edge);
+    padding: 6px;
+    background: var(--enamel);
+  }
+  .foot__portrait :global(img) {
+    width: 100%;
+    height: auto;
+    filter: saturate(0.9);
+  }
+
+  .foot__pitch {
+    font-family: var(--serif);
+    font-size: var(--step-1);
+    line-height: 1.45;
+    color: var(--ink-on-enamel);
+    margin: 0.75rem 0 1.5rem;
+    max-width: 30ch;
+    text-wrap: balance;
+  }
+
+  .foot__list {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .foot__list li { display: grid; gap: 0.1rem; }
+
+  .foot__role {
+    font-size: var(--micro-lg);
+    color: var(--ink-on-enamel-soft);
+    line-height: 1.35;
+  }
+
+  .foot__org {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--ink-on-enamel);
+    text-decoration: none;
+    border-bottom: var(--rule) solid var(--brass-dim);
+    padding-bottom: 1px;
+    justify-self: start;
+    transition: border-color 140ms ease, color 140ms ease;
+  }
+  .foot__org:hover { color: var(--signal); border-color: var(--signal); }
+
+  .foot__list--links a {
+    font-size: var(--step--1);
+    color: var(--ink-on-enamel);
+    text-decoration: none;
+    border-bottom: var(--rule) solid var(--brass-dim);
+    padding-bottom: 1px;
+    transition: border-color 140ms ease, color 140ms ease;
+  }
+  .foot__list--links a:hover { color: var(--signal); border-color: var(--signal); }
+  .foot__list--links li { display: block; }
+
+  .foot__legal {
+    margin-top: 1.75rem;
+    font-size: var(--micro-lg);
+    line-height: 1.6;
+    color: var(--ink-on-enamel-soft);
+  }
+
+  @media (max-width: 900px) {
+    .foot__inner { grid-template-columns: 1fr 1fr; }
+    .foot__contact { grid-column: 1 / -1; }
+    .foot__portrait { display: none; }
+  }
+  @media (max-width: 560px) {
+    .foot__inner { grid-template-columns: 1fr; }
+  }
+</style>
