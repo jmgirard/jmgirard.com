@@ -64,9 +64,12 @@
   --ink-on-enamel-soft: #8e968d;
   --ink-on-enamel-faint: #9aa197;
 
-  /* Sticky chrome heights, so stacked sticky layers cannot overlap. */
-  --chrome-h: 3.3rem;
-  --index-h: 2.3rem;
+  /* Sticky chrome heights, so stacked sticky layers cannot overlap.
+     These are MEASURED, not estimated — verify with a getBoundingClientRect
+     probe after changing anything in the chrome or the publications index bar,
+     or sticky year headings will clip underneath. */
+  --chrome-h: 3.5rem;   /* measured 55.1px @1440 */
+  --index-h: 3.125rem;  /* measured 49.4px @1440 */
 
   --rule: 1px;
   --rule-heavy: 2px;
@@ -92,7 +95,10 @@
 }
 
 @media (max-width: 720px) {
-  :root { --chrome-h: 5.2rem; --index-h: 2.1rem; }
+  :root {
+    --chrome-h: 5.625rem;  /* measured 88.3px @390 */
+    --index-h: 3.25rem;    /* measured 50.6px @390 */
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }

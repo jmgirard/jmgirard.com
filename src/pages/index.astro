@@ -19,13 +19,17 @@ const summary = summarize(publications);
 const SELECTED = [
   'girard2026',   // LLM evaluation on naturalistic speech
   'girard2026a',  // Annual Review — authority in the field
-  'girard2023a',  // DynAMoS — dataset design and collection
   'girard2025',   // applied affective computing in therapy
+  'girard2023a',  // DynAMoS — dataset design and collection
   'girard2021',   // measurement validation
 ];
 
 const byKey = new Map(publications.map((p) => [p.key, p]));
-const selected = SELECTED.map((k) => byKey.get(k)).filter(Boolean);
+// Curation decides WHICH five; the year rail still has to read as a scale, so
+// the set is sorted newest-first. A non-monotonic year column on this surface
+// reads as a sort bug, not as editorial judgement.
+const selected = SELECTED.map((k) => byKey.get(k)).filter(Boolean)
+  .sort((a, b) => b.year.sort - a.year.sort);
 const featuredSoftware = featured
   .map((name) => allSoftware.find((s) => s.name === name))
   .filter(Boolean);
