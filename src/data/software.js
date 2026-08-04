@@ -202,8 +202,9 @@ export const softwareSummary = {
 
 /** Curated highlights for the front panel; the full rack lives on /software. */
 /**
- * The front-panel six. Chosen for relevance to the three service ranges and
- * balanced across calibration states — deprecated tools stay on /software,
- * where the full record belongs, rather than fronting the offer.
+ * The front-panel six. Chosen for relevance to the three service ranges, not
+ * for popularity — the Quarto extensions are the most-starred work here but
+ * say nothing to someone hiring for measurement or model evaluation, so they
+ * stay on /software. Deprecated tools likewise never front the offer.
  */
-export const featured = ['circumplex', 'ackwards', 'intraclass', 'openac', 'honeypot', 'embedpdf'];
+export const featured = ['circumplex', 'ackwards', 'intraclass', 'hitop', 'openac', 'rstudio2u'];
