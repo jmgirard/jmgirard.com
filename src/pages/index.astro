@@ -5,6 +5,7 @@ import CalibrationRule from '../components/CalibrationRule.astro';
 import Arrow from '../components/Arrow.astro';
 import { loadPublications, summarize, formatAuthorsHtml } from '../lib/bib.js';
 import { groups, allSoftware, softwareSummary, featured, GRADES } from '../data/software.js';
+import { datasets, datasetSummary, ACCESS } from '../data/datasets.js';
 import portrait from '../assets/headshot-working.jpg';
 
 const publications = loadPublications();
@@ -112,6 +113,7 @@ const ranges = [
         <span class="readout__item"><b class="readout__n">{summary.withPreprint}</b>open preprints</span>
         <span class="readout__item"><b class="readout__n">{summary.withMaterials}</b>with data or code</span>
         <span class="readout__item"><b class="readout__n">{softwareSummary.total}</b>open-source tools</span>
+        <span class="readout__item"><b class="readout__n">{datasetSummary.total}</b>datasets and benchmarks</span>
       </p>
     </div>
   </section>
@@ -209,6 +211,35 @@ const ranges = [
           </li>
         ))}
       </ul>
+    </div>
+  </section>
+
+  <!-- ============ PANEL 3b · DATA ============ -->
+  <section class="data">
+    <div class="chassis">
+      <header class="section-head section-head--split">
+        <div>
+          <h2 class="section-head__title">
+            The datasets and benchmarks behind the claim.
+          </h2>
+        </div>
+        <a class="panel-link" href="/datasets">
+          All {datasetSummary.total} sets
+          <Arrow />
+        </a>
+      </header>
+
+      <ol class="data__list">
+        {datasets.map((d) => (
+          <li class="dset">
+            <span class="dset__year">{d.year}</span>
+            <a class="dset__name" href={`/datasets#${d.id}`}>{d.name}</a>
+            <span class="dset__kind engraved">{d.kind}</span>
+            <span class="dset__scale">{d.scale}</span>
+            <span class={`stamp stamp--${d.access}`}>{ACCESS[d.access].short}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 
@@ -514,6 +545,70 @@ const ranges = [
   }
 
   .instrument__lang { font-size: var(--micro-sm); }
+
+  /* ---------- Data ---------- */
+  .data { padding-block: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 3vw, 2.5rem); }
+
+  .data__list { list-style: none; margin: 0; padding: 0; }
+
+  /* A read-off rail: year, name, then the two facts a visitor screens on —
+     how big it is and whether they can have it. */
+  .dset {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(7rem, auto) 1fr auto auto;
+    align-items: baseline;
+    gap: 0.4rem clamp(0.75rem, 2vw, 1.5rem);
+    padding-block: 0.85rem;
+    border-top: var(--rule) solid var(--enamel-edge);
+  }
+  .dset:last-child { border-bottom: var(--rule) solid var(--enamel-edge); }
+
+  .dset__year {
+    font-weight: 700;
+    color: var(--brass);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--step--1);
+  }
+
+  .dset__name {
+    font-size: var(--step-1);
+    font-weight: 600;
+    text-decoration: none;
+    color: #f0ece0;
+    border-bottom: var(--rule-heavy) solid transparent;
+    transition: color 140ms ease, border-color 140ms ease;
+  }
+  .dset__name:hover { color: var(--signal); border-color: var(--signal); }
+
+  .dset__kind { font-size: var(--micro); }
+
+  .dset__scale {
+    font-size: var(--step--1);
+    color: var(--ink-on-enamel-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .data .stamp--open { color: var(--signal); }
+  .data .stamp--gated { color: var(--brass); }
+  .data .stamp--request { color: var(--ink-on-enamel-soft); }
+
+  /* Narrow: the rail folds to a stub — year and access stay on the title line,
+     the two descriptors stack under the name rather than fighting for width. */
+  @media (max-width: 720px) {
+    .dset {
+      grid-template-columns: 3.5rem 1fr auto;
+      grid-template-areas:
+        'year name  stamp'
+        '.    kind  kind'
+        '.    scale scale';
+      row-gap: 0.15rem;
+    }
+    .dset__year { grid-area: year; }
+    .dset__name { grid-area: name; }
+    .dset__kind { grid-area: kind; }
+    .dset__scale { grid-area: scale; }
+    .dset .stamp { grid-area: stamp; }
+  }
 
   /* ---------- Record ---------- */
   .record { padding-bottom: clamp(3.5rem, 7vw, 6rem); }
