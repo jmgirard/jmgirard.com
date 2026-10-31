@@ -19,8 +19,6 @@ const PORT = 9333;
 
 const ROUTES = [
   ['index', '/'],
-  ['publications', '/publications'],
-  ['software', '/software'],
 ];
 
 const DEVICES = [

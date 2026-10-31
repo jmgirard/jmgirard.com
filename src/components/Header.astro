@@ -1,0 +1,66 @@
+---
+const links = [
+  { href: '/#about', label: 'About' },
+  { href: '/#work', label: 'Work with me' },
+  { href: '/#papers', label: 'Papers' },
+  { href: 'https://affcom.ku.edu', label: 'AffCom Lab' },
+];
+---
+
+<header class="bar">
+  <div class="wrap bar__inner">
+    <a class="bar__name" href="/">Jeff Girard</a>
+    <nav class="bar__nav" aria-label="Sections">
+      {links.map((l) => <a class="bar__link" href={l.href}>{l.label}</a>)}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .bar__name {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.25rem;
+    text-decoration: none;
+  }
+
+  .bar__nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.4rem; }
+
+  /* The lab navbar's hover: a hairline grows under the link. */
+  .bar__link {
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding-bottom: 0.15rem;
+    background: linear-gradient(var(--ink), var(--ink)) no-repeat left bottom / 0 1.5px;
+    transition: background-size 0.25s ease;
+  }
+  .bar__link:hover, .bar__link:focus-visible { background-size: 100% 1.5px; }
+
+  @media (max-width: 560px) {
+    .bar__inner { padding-block: 0.7rem; }
+    .bar__nav { gap: 0.2rem 1rem; }
+    .bar__link { font-size: 0.9rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar__link { transition: none; }
+  }
+</style>

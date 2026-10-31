@@ -1,12 +1,11 @@
 ---
-import '../styles/instrument.css';
-import Chrome from '../components/Chrome.astro';
+import '../styles/site.css';
+import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 const {
   title,
-  description = 'Psychological measurement and machine learning — datasets, benchmarks, and model evaluation for systems that make claims about human behavior.',
-  panel = 'index',
+  description = 'Jeff Girard works on psychological measurement and machine learning: datasets, benchmarks and model evaluation for systems that make claims about human behavior.',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -24,30 +23,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
-    <meta name="theme-color" content="#121a16" />
-    <link rel="preload" href="/fonts/archivo-variable.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/literata-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#faf7f2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The lab site's two families, at the weights it uses. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Source+Sans+3:wght@400;600;700&display=swap"
+    />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
-  <body data-panel={panel}>
-    <!--
-      THESIS: This surface is a measuring instrument; every claim on it carries the
-      tolerance stamped beside it. It refuses both category ruts — the consultant hero
-      with three service cards, and the faculty page with a sidebar headshot.
-      OWN-WORLD: Dark enamelled green-black chassis with warm cream engraved plates
-      inset for reading; brass hairlines rule everything; amber is spent only on live
-      state and the single action. Engraved condensed caps label; a technical serif reads.
-      STORY: A visitor sees measurement demonstrated with real data before any claim is
-      made, believes the rigor is verifiable rather than asserted, and emails him.
-      FIRST VIEWPORT: Full-width enamel panel; engraved nameplate; a calibrated rule whose
-      68 ticks are the real publications 2011–2026, lab-led ones cut deeper in amber;
-      working portrait right in an inset bezel, gaze travelling left; amber email control.
-      FORM: The calibrated bench instrument; candidate 6 of the ordered grounded list;
-      seed key 7dea6c86.
-      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
-    -->
+  <body>
     <a class="skip" href="#main">Skip to content</a>
-    <Chrome />
+    <Header />
     <main id="main">
       <slot />
     </main>

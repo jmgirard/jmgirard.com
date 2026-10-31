@@ -1,13 +1,14 @@
 /**
- * BibTeX reader for references.bib.
+ * BibTeX reader for the lab's publications.bib.
  *
- * Written against the actual file rather than the general grammar: 68 entries
- * using @article / @inproceedings / @incollection / @misc, brace-delimited
- * values, unquoted numeric years, and three custom fields that carry real
- * meaning on this site — `primary` (lab-led work), `preprint`, `materials`.
+ * The record of truth lives in the AffCom Lab repo; this site fetches it at
+ * build time so there is one file to keep current, not two. Written against
+ * that file rather than the general grammar: @article / @inproceedings /
+ * @incollection / @misc, brace-delimited values, unquoted numeric years, and
+ * three custom fields — `primary` (lab-led work), `preprint`, `materials`.
  */
 
-import { readFileSync } from 'node:fs';
+export const LAB_BIB_URL = 'https://raw.githubusercontent.com/jmgirard/affcomlab/main/publications.bib';
 
 const AUTHOR = 'Girard';
 
@@ -140,8 +141,11 @@ function doiUrl(doi) {
 
 const VENUE_FIELDS = ['journal', 'booktitle', 'publisher'];
 
-export function loadPublications(path = 'references.bib') {
-  const src = readFileSync(path, 'utf8');
+export async function loadPublications(url = LAB_BIB_URL) {
+  const res = await fetch(url);
+  // Fail the build rather than ship a page with an empty record.
+  if (!res.ok) throw new Error(`Could not fetch ${url}: ${res.status} ${res.statusText}`);
+  const src = await res.text();
 
   const pubs = splitEntries(src).map(({ type, key, body }) => {
     const f = parseFields(body);
@@ -178,43 +182,8 @@ export function loadPublications(path = 'references.bib') {
   return pubs;
 }
 
-/** Counts and ranges the interface states as fact rather than assertion. */
-export function summarize(pubs) {
-  const dated = pubs.filter((p) => p.year.value !== null);
-  const years = dated.map((p) => p.year.value);
-  const byYear = new Map();
-  for (const p of dated) byYear.set(p.year.value, (byYear.get(p.year.value) || 0) + 1);
-
-  const min = Math.min(...years);
-  const max = Math.max(...years);
-  const span = [];
-  for (let y = min; y <= max; y++) {
-    span.push({ year: y, count: byYear.get(y) || 0, labLed: dated.filter((p) => p.year.value === y && p.labLed).length });
-  }
-
-  return {
-    total: pubs.length,
-    labLed: pubs.filter((p) => p.labLed).length,
-    firstYear: min,
-    lastYear: max,
-    withPreprint: pubs.filter((p) => p.preprint).length,
-    withMaterials: pubs.filter((p) => p.materials).length,
-    journals: pubs.filter((p) => p.venueKind === 'journal').length,
-    conferences: pubs.filter((p) => p.venueKind === 'conference').length,
-    inPress: pubs.filter((p) => p.year.value === null).length,
-    span,
-    peak: Math.max(...span.map((s) => s.count)),
-  };
-}
-
-/** Vancouver-ish. */
-export function formatAuthors(authors, max = 8) {
-  const shown = authors.slice(0, max).map((a) => `${a.family} ${a.initials}`.trim());
-  return authors.length > max ? `${shown.join(', ')}, et al.` : shown.join(', ');
-}
-
 /**
- * Same list, with Girard emphasised. Built from the author objects rather than
+ * Vancouver-ish author list with Girard emphasised. Built from the author objects rather than
  * by replacing text: "Girard J." is a substring of "Girard J. M.", so string
  * surgery double-wraps the very entries that matter most.
  */

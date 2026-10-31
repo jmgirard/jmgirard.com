@@ -10,31 +10,32 @@ npm run build    # -> dist/
 npm run preview  # serve the built output
 ```
 
+## What this site is
+
+A one-page personal front door for consulting and outside collaborators. The
+full research record lives on the lab site, [affcom.ku.edu](https://affcom.ku.edu)
+(repo `jmgirard/affcomlab`), and this site links there instead of repeating it.
+It uses the lab site's palette, fonts, buttons and cards so the two read as one
+family. See `DESIGN.md`.
+
 ## Where the content lives
 
 | What | Source | Notes |
 |---|---|---|
-| Publications | `references.bib` | Parsed at build time by `src/lib/bib.js`. Never hand-transcribe an entry into markup — edit the .bib and rebuild. |
-| Software | `src/data/software.js` | The 19 projects from the GitHub profile README, with their maturity labels. |
-| Bio | `bio.md` | Source of record. `src/pages/index.astro` mirrors it; keep them in sync. |
-| Product context | `PRODUCT.md` | Audience, positioning, constraints, infrastructure facts. |
+| Publications | `publications.bib` in `jmgirard/affcomlab` | Fetched from GitHub at build time by `src/lib/bib.js`. The build fails if the fetch fails or a selected key is missing. |
+| Selected papers | `SELECTED` in `src/pages/index.astro` | Five bib keys. Each title links to its card on the lab publications page. |
+| Services, appointments, bio | `src/pages/index.astro` | `bio.md` (gitignored) is the source of record for the bio. |
+| Old pages | `redirects` in `astro.config.mjs` | `/publications`, `/software` and `/datasets` redirect to the lab site. |
 
-### The BibTeX custom fields
-
-`references.bib` carries three non-standard fields the build depends on:
-
-- `primary = {true}` — lab-led work Jeff drove, regardless of author position.
-  Renders as amber ticks on the calibration rule and as flagged entries.
-- `preprint = {url}` — open preprint. Rendered as a PREPRINT link.
-- `materials = {url}` — data or code. Rendered as a MATERIALS link.
-
-Non-numeric years (`in press`) are supported and sort ahead of dated entries.
+Because the bib comes from the lab repo, a new paper there shows up here (in the
+publication count) on the next build of this site. Push to `main` or run the
+workflow by hand to rebuild.
 
 ### Photography
 
-Camera originals are gitignored. The committed derivatives the build consumes
-live in `src/assets/` (`headshot-working.jpg` for the hero, `headshot-smiling.jpg`
-for the footer). Regenerate from the originals if a different crop is needed:
+Camera originals are gitignored. The committed derivative the build consumes is
+`src/assets/headshot-working.jpg`. Regenerate it from the original if a
+different crop is needed:
 
 ```bash
 sips -Z 2400 --setProperty formatOptions 88 --out src/assets/headshot-working.jpg <original>.JPG
